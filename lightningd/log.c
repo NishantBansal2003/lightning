@@ -7,6 +7,7 @@
 #include <ccan/tal/str/str.h>
 #include <common/configvar.h>
 #include <common/json_command.h>
+#include <ccan/json_escape/json_escape.h>
 #include <common/json_param.h>
 #include <common/memleak.h>
 #include <errno.h>
@@ -570,21 +571,35 @@ void logv(struct logger *log, enum log_level level,
 	if (vasprintf(&l->log, fmt, ap) == -1)
 		abort();
 
-	size_t log_len = strlen(l->log);
+	tal_t *ctx = tal(NULL, char);
+	const char *log_line = tal_strdup(
+	    ctx, json_escape_unescape(ctx, (struct json_escape *)l->log));
+	char **lines = tal_strsplit(ctx, log_line, "\n", STR_NO_EMPTY);
 
-	/* Sanitize any non-printable characters, and replace with '?' */
-	for (size_t i=0; i<log_len; i++)
-		if (l->log[i] < ' ' || l->log[i] >= 0x7f)
-			l->log[i] = '?';
+	/* Split to lines and log them separately. */
+	for (size_t i = 0; i < tal_count(lines) - 1; i++) {
+		struct log_entry *line_entry =
+		    new_log_entry(log, level, node_id);
+		line_entry->log = tal_strdup(ctx, lines[i]);
 
-	maybe_print(log, l);
-	maybe_notify_log(log, l);
+		/* Sanitize any non-printable characters, and replace with '?'
+		 */
+		size_t line_len = strlen(line_entry->log);
+		for (size_t i = 0; i < line_len; i++)
+			if (line_entry->log[i] < ' ' ||
+			    line_entry->log[i] >= 0x7f)
+				line_entry->log[i] = '?';
 
-	add_entry(log, &l);
+		maybe_print(log, line_entry);
+		maybe_notify_log(log, line_entry);
+
+		add_entry(log, &line_entry);
+	}
 
 	if (call_notifier)
 		notify_warning(log->log_book->ld, l);
 
+	tal_free(ctx);
 	errno = save_errno;
 }
 
