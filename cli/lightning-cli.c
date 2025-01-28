@@ -49,6 +49,9 @@ static size_t human_readable(const char *buffer, const jsmntok_t *t, char term)
 					i++;
 					continue;
 				}
+			} else if (buffer[i] == '|') {
+				fputc('\n', stdout);
+				continue;
 			}
 			fputc(buffer[i], stdout);
 		}
@@ -174,6 +177,13 @@ same_category:
 			   buffer);
 }
 
+static void replace_char(char *buf, size_t len, char old, char new)
+{
+	char *p = buf, *end = buf + len;
+	while ((p = memchr(p, old, end - p)) != NULL)
+		*p = new;
+}
+
 static void human_help(char *buffer, const jsmntok_t *result)
 {
 	unsigned int i;
@@ -197,6 +207,8 @@ static void human_help(char *buffer, const jsmntok_t *result)
 	for (i = 0; i < tal_count(help); i++) {
 		const jsmntok_t *command;
 		command = json_get_member(buffer, help[i], "command");
+		replace_char(buffer + command->start,
+			     command->end - command->start, '|', '\n');
 		printf("%.*s\n\n",
 		       command->end - command->start, buffer + command->start);
 	}
