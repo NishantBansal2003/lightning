@@ -1349,17 +1349,14 @@ def test_channel_closed_notification(node_factory):
     cid = l2.rpc.listpeerchannels()["channels"][0]["channel_id"]
     closing_txid = only_one(l1.rpc.close(cid)['txids'])
 
-    # bitcoind.generate_block(6, wait_for_mempool=1)
-    # sync_blockheight(bitcoind, [l1, l2])
-
     l1.daemon.wait_for_log(
-        r"A channel was closed to us by {}, with closing transaction id: {}".format(
+        r"A channel was closed to us by {}, with a closing transaction ID: {}".format(
             l2.rpc.getinfo()["id"],
             closing_txid,
         )
     )
     l2.daemon.wait_for_log(
-        r"A channel was closed to us by {}, with closing transaction id: {}".format(
+        r"A channel was closed to us by {}, with a closing transaction ID: {}".format(
             l1.rpc.getinfo()["id"],
             closing_txid,
         )
