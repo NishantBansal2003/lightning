@@ -25,10 +25,9 @@ def channel_opened(plugin, channel_opened, **kwargs):
 @plugin.subscribe("channel_closed")
 def channel_closed(plugin, channel_closed, **kwargs):
     plugin.log(
-        "A channel was closed to us by {}, with a closing transaction ID: {}".format(
-            channel_closed["id"], channel_closed["closing_txid"]
-        )
-    )
+        "A channel was closed to us by {}, with a closing"
+        " transaction ID: {}".format(channel_closed["id"],
+                                     channel_closed["closing_txid"]))
 
 
 @plugin.subscribe("channel_state_changed")

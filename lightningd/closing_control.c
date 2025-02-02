@@ -334,7 +334,7 @@ static void peer_closing_complete(struct channel *channel, const u8 *msg)
 	struct bitcoin_txid closing_txid;
 	bitcoin_txid(channel->last_tx, &closing_txid);
 
-	/* Tell plugins about the success */
+	/* Tell plugin about the channel close. */
 	notify_channel_closed(channel->peer->ld, &channel->peer->id,
 			      &closing_txid);
 
@@ -914,9 +914,6 @@ static struct command_result *json_close(struct command *cmd,
 
 	/* In case we changed anything, save it. */
 	wallet_channel_save(cmd->ld->wallet, channel);
-
-
-
 
 	/* Wait until close drops down to chain. */
 	return command_still_pending(cmd);
