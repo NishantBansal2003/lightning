@@ -51,8 +51,8 @@ void notify_channel_opened(struct lightningd *ld,
 			   bool channel_ready);
 
 void notify_channel_closed(struct lightningd *ld,
-				const struct node_id *node_id,
-				const struct bitcoin_txid *closing_txid);
+			   const struct node_id *node_id,
+			   const struct bitcoin_txid *closing_txid);
 
 void notify_channel_state_changed(struct lightningd *ld,
 				  const struct node_id *peer_id,

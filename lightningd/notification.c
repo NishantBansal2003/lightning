@@ -293,9 +293,9 @@ void notify_channel_opened(struct lightningd *ld,
 }
 
 static void channel_closed_notification_serialize(struct json_stream *stream,
-							struct lightningd *ld,
-    						const struct node_id *node_id,
-							const struct bitcoin_txid *closing_txid)
+						  struct lightningd *ld,
+						  const struct node_id *node_id,
+						  const struct bitcoin_txid *closing_txid)
 {
 	json_add_node_id(stream, "id", node_id);
 	json_add_txid(stream, "closing_txid", closing_txid);
@@ -304,8 +304,8 @@ static void channel_closed_notification_serialize(struct json_stream *stream,
 REGISTER_NOTIFICATION(channel_closed)
 
 void notify_channel_closed(struct lightningd *ld,
-				const struct node_id *node_id,
-				const struct bitcoin_txid *closing_txid)
+			   const struct node_id *node_id,
+			   const struct bitcoin_txid *closing_txid)
 {
 	struct jsonrpc_notification *n = notify_start("channel_closed");
 	channel_closed_notification_serialize(n->stream, ld, node_id, closing_txid);
