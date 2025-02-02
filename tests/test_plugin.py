@@ -1339,22 +1339,24 @@ def test_channel_closed_notification(node_factory):
     """
     Test the 'channel_closed' notification sent at channel closing success.
     """
+    plugin_path=os.path.join(os.getcwd(), "tests/plugins/misc_notifications.py")
     opts = [
-        {},
-        {"plugin": os.path.join(os.getcwd(), "tests/plugins/misc_notifications.py")},
+        {"plugin": plugin_path},
+        {"plugin": plugin_path},
     ]
     amount = 10**6
-    l1, l2 = node_factory.line_graph(2, fundchannel=True, fundamount=amount, opts=opts)
+    l1, l2 = node_factory.line_graph(2, fundchannel=True, fundamount=amount,
+                                     opts=opts)
 
-    cid = l2.rpc.listpeerchannels()["channels"][0]["channel_id"]
-    closing_txid = only_one(l1.rpc.close(cid)['txids'])
-
+    closing_txid = only_one(l2.rpc.close(l1.info['id'])['txids'])
+    
     l1.daemon.wait_for_log(
         r"A channel was closed to us by {}, with a closing transaction ID: {}".format(
             l2.rpc.getinfo()["id"],
             closing_txid,
         )
     )
+
     l2.daemon.wait_for_log(
         r"A channel was closed to us by {}, with a closing transaction ID: {}".format(
             l1.rpc.getinfo()["id"],
