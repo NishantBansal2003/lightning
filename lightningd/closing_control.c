@@ -31,6 +31,7 @@
 #include <lightningd/jsonrpc.h>
 #include <lightningd/lightningd.h>
 #include <lightningd/log.h>
+#include <lightningd/notification.h>
 #include <lightningd/opening_common.h>
 #include <lightningd/options.h>
 #include <lightningd/peer_control.h>
@@ -329,6 +330,13 @@ static void peer_closing_complete(struct channel *channel, const u8 *msg)
 			  CLOSINGD_COMPLETE,
 			  REASON_UNKNOWN,
 			  "Closing complete");
+
+	struct bitcoin_txid closing_txid;
+	bitcoin_txid(channel->last_tx, &closing_txid);
+
+	/* Tell plugins about the success */
+	notify_channel_closed(channel->peer->ld, &channel->peer->id,
+			      &closing_txid);
 
 	/* Channel gets dropped to chain cooperatively. */
 	drop_to_chain(channel->peer->ld, channel, true, NULL);
@@ -906,6 +914,9 @@ static struct command_result *json_close(struct command *cmd,
 
 	/* In case we changed anything, save it. */
 	wallet_channel_save(cmd->ld->wallet, channel);
+
+
+
 
 	/* Wait until close drops down to chain. */
 	return command_still_pending(cmd);
