@@ -1347,12 +1347,12 @@ def test_channel_closed_notification(node_factory):
 
     closing_txid = only_one(l2.rpc.close(l1.info['id'])['txids'])
 
-    l1.daemon.wait_for_log(r"A channel was closed to us by {}, with a closing"
+    l1.daemon.wait_for_log(r"A channel was closed to us by {}, with a closing "
                            "transaction ID: {}".format(l2.rpc.getinfo()["id"],
                                                        closing_txid,))
 
     l2.daemon.wait_for_log(r"A channel was closed to us by {}, with a closing"
-                           "transaction ID: {}".format(l1.rpc.getinfo()["id"],
+                           " transaction ID: {}".format(l1.rpc.getinfo()["id"],
                                                        closing_txid,))
 
 
