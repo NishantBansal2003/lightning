@@ -1349,11 +1349,11 @@ def test_channel_closed_notification(node_factory):
 
     l1.daemon.wait_for_log(r"A channel was closed to us by {}, with a closing"
                            " transaction ID: {}".format(l2.rpc.getinfo()["id"],
-                                                       closing_txid,))
+                                                        closing_txid,))
 
     l2.daemon.wait_for_log(r"A channel was closed to us by {}, with a closing"
                            " transaction ID: {}".format(l1.rpc.getinfo()["id"],
-                                                       closing_txid,))
+                                                        closing_txid,))
 
 
 def test_forward_event_notification(node_factory, bitcoind, executor):
