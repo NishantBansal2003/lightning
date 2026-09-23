@@ -583,7 +583,7 @@ static struct short_channel_id *gather_range(const tal_t *ctx,
 		*csums = NULL;
 
 	if (number_of_blocks == 0)
-		return NULL;
+		return NULL; // scids
 
 	/* Fix up number_of_blocks to avoid overflow. */
 	end_block = first_blocknum + number_of_blocks - 1;

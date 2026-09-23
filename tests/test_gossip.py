@@ -896,6 +896,20 @@ def test_gossip_query_channel_range(node_factory, bitcoind, chainparams):
                     # encoded_short_ids
                     + '000100']
 
+    # Zero blocks (BOLT 7 forbids it, but we must not crash): empty reply
+    msgs = l4.query_gossip('query_channel_range',
+                           genesis_blockhash,
+                           block23 + 1, 0,
+                           filters=['0109', '0107', '0012'])
+    # reply_channel_range == 264
+    assert msgs == ['0108'
+                    # blockhash
+                    + genesis_blockhash
+                    # first_blocknum, number_of_blocks, complete
+                    + format(block23 + 1, '08x') + format(0, '08x') + '01'
+                    # encoded_short_ids
+                    + '000100']
+
     # Make l4 split reply into two (technically async)
     l4.rpc.dev_set_max_scids_encode_size(max=9)
     l4.daemon.wait_for_log('Set max_scids_encode_bytes to 9')
